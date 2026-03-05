@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Louis Designs | Premium Digital Creative Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FF8C00;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        h1, h2, h3, h4, h5, h6, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #FF8C00; }
+        ::-webkit-scrollbar-thumb { background: #000; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #333; }
+        
+        /* FIXED SLIDER STYLES - Uniform Box Method */
+        .slider-wrapper { 
+            position: relative; 
+            width: 100%;
+            height: 550px; /* Fixed height for desktop */
+            background: rgba(0, 0, 0, 0.08);
+            border: 4px solid #000;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .slider-wrapper {
+                height: 450px; /* Mobile height */
+                border-width: 2px;
+            }
+        }
+        
+        .slider-track { 
+            display: flex; 
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            height: 100%;
+            width: 100%;
+        }
+        
+        .slide { 
+            min-width: 100%; 
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            position: relative;
+        }
+        
+        /* Glassmorphism Effect */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        
+        .slide.active::before {
+            opacity: 1;
+        }
+        
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+        
+        .slide:hover img {
+            transform: scale(1.02);
+        }
+        
+        /* Navigation Arrows - Show on Hover (Desktop) */
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: 2px solid #000;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 28px;
+            font-weight: bold;
+            user-select: none;
+        }
+        
+        @media (hover: hover) {
+            .slider-wrapper:hover .slider-nav {
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .slider-nav {
+                opacity: 1;
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+            .slider-nav.prev { left: 12px; }
+            .slider-nav.next { right: 12px; }
+        }
+        
+        .slider-nav:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .slider-nav:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .slider-nav.prev {
+            left: 25px;
+        }
+        
+        .slider-nav.next {
+            right: 25px;
+        }
+        
+        /* Pagination Dots */
+        .slider-dots {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 12px 24px;
+            border-radius: 35px;
+            backdrop-filter: blur(4px);
+        }
+        
+        .slider-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .slider-dot.active {
+            background: #fff;
+            border-color: #000;
+            transform: scale(1.25);
+        }
+        
+        .slider-dot:hover {
+            background: #fff;
+            transform: scale(1.15);
+        }
+        
+        .slider-dot:active {
+            transform: scale(1);
+        }
+        
+        /* Navigation */
+        .nav-link { 
+            position: relative; 
+            transition: all 0.3s ease;
+            color: #000;
+        }
+        .nav-link:hover {
+            color: #fff;
+        }
+        .nav-link::after {
+            content: ''; 
+            position: absolute; 
+            bottom: -4px; 
+            left: 0; 
+            width: 0; 
+            height: 2px;
+            background: #000; 
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { 
+            width: 100%; 
+            background: #fff;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: #000;
+            color: #FF8C00;
+            transition: all 0.3s ease;
+            border: 2px solid #000;
+        }
+        .btn-primary:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background-color: #000;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 2px solid #000;
+        }
+        .btn-secondary:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+        
+        /* Form inputs */
+        .form-input, .form-textarea {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #000;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+        }
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: #666;
+        }
+        
+        /* Cards */
+        .card {
+            background-color: #fff;
+            border: 2px solid #000;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            background-color: #000;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .card:active {
+            background-color: #000;
+            color: #fff;
+        }
+        
+        /* Price items - Desktop hover */
+        .price-item {
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        @media (hover: hover) {
+            .price-item:hover {
+                background-color: rgba(255,255,255,0.3);
+                padding-left: 10px;
+            }
+        }
+        /* Mobile active state */
+        .price-item:active {
+            background-color: rgba(255,255,255,0.3);
+            padding-left: 10px;
+        }
+        
+        /* Special class for ₦60k item - NO white hover */
+        .price-item.no-hover-effect {
+            transition: all 0.3s ease;
+        }
+        @media (hover: hover) {
+            .price-item.no-hover-effect:hover {
+                background-color: transparent;
+                padding-left: 0;
+            }
+        }
+        .price-item.no-hover-effect:active {
+            background-color: rgba(255,255,255,0.1);
+            padding-left: 5px;
+        }
+        
+        /* Section backgrounds */
+        .section-alt {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Intro Animation Styles */
+        #intro-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FF8C00;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .geometric-shape {
+            position: absolute;
+            border: 3px solid #000;
+            opacity: 0;
+        }
+
+        .circle-1 {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+        }
+
+        .circle-2 {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+        }
+
+        .line-horizontal {
+            width: 250px;
+            height: 3px;
+            background: #000;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            transform-origin: center center;
+        }
+
+        .line-vertical {
+            width: 3px;
+            height: 250px;
+            background: #000;
+            top: 50%;
+            left: 50%;
+            transform: translateY(-50%) scaleY(0);
+            transform-origin: center center;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .tagline {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #000;
+            opacity: 0;
+            font-weight: 300;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        /* Main content hidden initially */
+        .main-content {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .logo-wrapper {
+                width: 250px;
+                height: 250px;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .tagline {
+                font-size: 10px;
+                letter-spacing: 4px;
+                bottom: -50px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn-primary:hover,
+            .btn-secondary:hover,
+            .card:hover,
+            .price-item:hover {
+                background-color: inherit;
+                color: inherit;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Intro Animation Loader -->
+    <div id="intro-loader">
+        <div class="logo-wrapper">
+            <div class="geometric-shape circle-1"></div>
+            <div class="geometric-shape circle-2"></div>
+            <div class="geometric-shape line-horizontal"></div>
+            <div class="geometric-shape line-vertical"></div>
+            <div class="particle" style="top: 15%; left: 25%;"></div>
+            <div class="particle" style="top: 75%; left: 80%;"></div>
+            <div class="particle" style="top: 35%; left: 85%;"></div>
+            <div class="particle" style="top: 80%; left: 20%;"></div>
+            <div class="particle" style="top: 10%; left: 70%;"></div>
+            <div class="particle" style="top: 65%; left: 10%;"></div>
+            <img src="dark LD logo.png" alt="Louis Designs Logo" class="logo-img" id="logoImage">
+            <div class="tagline">Premium Design Studio</div>
+        </div>
+    </div>
+
+    <!-- Main Website Content -->
+    <div class="main-content" id="mainContent">
+
+    <!-- Sticky Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-[#FF8C00]/95 backdrop-blur-sm border-b-2 border-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-2 sm:gap-3 group">
+                <img src="dark LD logo.png" alt="Louis Designs Logo" class="h-10 w-auto sm:h-12">
+                <span class="text-base sm:text-xl font-bold tracking-tight uppercase hidden sm:block">Louis Designs</span>
+            </a>
+            <nav class="flex items-center gap-4 sm:gap-8">
+                <a href="#home" class="nav-link text-xs sm:text-sm font-bold uppercase tracking-wider">Home</a>
+                <a href="#services" class="nav-link text-xs sm:text-sm font-bold uppercase tracking-wider hidden sm:block">Services</a>
+                <a href="#support" class="nav-link text-xs sm:text-sm font-bold uppercase tracking-wider">Support</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Section 1: Home (Hero + FIXED 7-Image Portfolio Slider) -->
+    <section id="home" class="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 fade-in">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-12 sm:mb-16">
+                <!-- Hero Content -->
+                <div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4 sm:mb-6 uppercase">
+                        Louis<br>Designs
+                    </h1>
+                    <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed font-medium">
+                        Welcome to Louis Designs — a space where imagination takes shape. I'm Louis, a Website designer who blends creativity with different design tools to bring ideas to life.
+                    </p>
+                    <a href="#booking" class="inline-block btn-primary px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-widest">
+                        Book A Design
+                    </a>
+                </div>
+                
+                <!-- FIXED Portfolio Slider with Glassmorphism -->
+                <div class="slider-wrapper" id="sliderWrapper">
+                    <div class="slider-track" id="portfolioSlider">
+                        <div class="slide active"><img src="Image1.jpg" alt="Portfolio Design 1" loading="lazy"></div>
+                        <div class="slide"><img src="Image2.png" alt="Portfolio Design 2" loading="lazy"></div>
+                        <div class="slide"><img src="Image3.jpg" alt="Portfolio Design 3" loading="lazy"></div>
+                        <div class="slide"><img src="Image4.png" alt="Portfolio Design 4" loading="lazy"></div>
+                        <div class="slide"><img src="Image5.jpg" alt="Portfolio Design 5" loading="lazy"></div>
+                        <div class="slide"><img src="Image6.png" alt="Portfolio Design 6" loading="lazy"></div>
+                        <div class="slide"><img src="Image7.jpg" alt="Portfolio Design 7" loading="lazy"></div>
+                    </div>
+                    
+                    <!-- Navigation Arrows -->
+                    <button class="slider-nav prev" onclick="changeSlide(-1)" aria-label="Previous slide">&#10094;</button>
+                    <button class="slider-nav next" onclick="changeSlide(1)" aria-label="Next slide">&#10095;</button>
+                    
+                    <!-- Pagination Dots -->
+                    <div class="slider-dots" id="sliderDots"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Services (Text Only) -->
+    <section id="services" class="py-16 sm:py-20 px-4 sm:px-6 section-alt">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3 sm:mb-4 uppercase">Our Services</h2>
+            <div class="w-16 sm:w-24 h-1 bg-black mx-auto mb-8 sm:mb-12"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-12">
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Logo Design</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Web Design (UI/UX)</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Brochure Design</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Invitation Card</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Info Graphics</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Flyers</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Posters</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Photo Editing</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Resume Design</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Book Covers</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Magazine Cover Design</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Menus</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Album Cover</h3></div>
+                <div class="card p-4 sm:p-6"><h3 class="font-bold text-base sm:text-lg mb-1 uppercase">Shirt Design</h3></div>
+            </div>
+            <div class="text-center pt-6 sm:pt-8 border-t-2 border-black">
+                <p class="italic font-serif text-base sm:text-lg font-medium px-4">
+                    "Every project includes two free revisions to fine-tune your design until it feels just right."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Support (Price List & Payments) -->
+    <section id="support" class="py-16 sm:py-20 px-4 sm:px-6">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3 sm:mb-4 uppercase">Support</h2>
+            <div class="w-16 sm:w-24 h-1 bg-black mx-auto mb-8 sm:mb-12"></div>
+            
+            <!-- Price List -->
+            <div class="bg-white border-2 sm:border-4 border-black p-6 sm:p-8 mb-8 sm:mb-12">
+                <h3 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center uppercase border-b-2 border-black pb-3 sm:pb-4">
+                    Louis Designs Price List (Digital Only)
+                </h3>
+                <div class="grid sm:grid-cols-2 gap-x-8 sm:gap-x-12 gap-y-1 sm:gap-y-2">
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Invitation Card (1 Page)</span>
+                        <span class="font-bold text-sm sm:text-base">₦10,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Info Graphics (1 Page)</span>
+                        <span class="font-bold text-sm sm:text-base">₦10,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Flyer (1)</span>
+                        <span class="font-bold text-sm sm:text-base">₦15,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Brochure Design (3 pages)</span>
+                        <span class="font-bold text-sm sm:text-base">₦40,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Logo Design</span>
+                        <span class="font-bold text-sm sm:text-base">₦5,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Posters</span>
+                        <span class="font-bold text-sm sm:text-base">₦10,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Photo Editing</span>
+                        <span class="font-bold text-sm sm:text-base">₦3,000 - ₦5,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Resume Design</span>
+                        <span class="font-bold text-sm sm:text-base">₦15,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Book Covers (Front & Back)</span>
+                        <span class="font-bold text-sm sm:text-base">₦20,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Magazine Cover (Front & Back)</span>
+                        <span class="font-bold text-sm sm:text-base">₦30,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Menus (1 Page)</span>
+                        <span class="font-bold text-sm sm:text-base">₦15,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Album Cover</span>
+                        <span class="font-bold text-sm sm:text-base">₦10,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Shirt Design</span>
+                        <span class="font-bold text-sm sm:text-base">₦20,000</span>
+                    </div>
+                    <div class="price-item py-2 sm:py-3 flex justify-between items-center">
+                        <span class="text-sm sm:text-base">Portfolio Landing Page</span>
+                        <span class="font-bold text-sm sm:text-base">₦40,000</span>
+                    </div>
+                    <div class="price-item no-hover-effect py-2 sm:py-3 flex justify-between items-center bg-black text-white px-2 -mx-2 sm:-mx-4 rounded">
+                        <span class="font-bold text-sm sm:text-base">Portfolio/Business Landing Page (Includes Booking System + Flutterwave)</span>
+                        <span class="font-bold text-sm sm:text-base">₦60,000</span>
+                    </div>
+                </div>
+                <p class="text-center mt-4 sm:mt-6 text-xs sm:text-sm font-medium">Note: All prices are in Nigerian Naira (₦)</p>
+            </div>
+            
+            <!-- Payment Button -->
+            <div class="text-center mb-10 sm:mb-12">
+                <a href="https://flutterwave.com/pay/bv9vz1sg5ucr" target="_blank" rel="noopener noreferrer"
+                   class="inline-block btn-secondary px-8 sm:px-10 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-widest">
+                    Proceed to Payment
+                </a>
+            </div>
+            
+            <!-- Refund Policy -->
+            <div class="bg-white border-2 sm:border-4 border-black p-6 sm:p-8">
+                <h3 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 uppercase">Refund Policy</h3>
+                <div class="space-y-3 sm:space-y-4 text-sm sm:text-base">
+                    <div>
+                        <p class="font-bold mb-1 sm:mb-2">Before work starts:</p>
+                        <p>Clients are eligible for a <span class="font-bold">full refund</span> if they decide to cancel.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold mb-1 sm:mb-2">After work is completed:</p>
+                        <ul class="list-disc list-inside space-y-1 sm:space-y-2 ml-2">
+                            <li>For <span class="font-bold">website design projects</span>, a <span class="font-bold">15% workmanship fee</span> is deducted if the client cancels after completion.</li>
+                            <li>For <span class="font-bold">smaller services</span> (e.g., brochure design), a <span class="font-bold">10% workmanship fee</span> applies after completion.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-bold mb-1 sm:mb-2">How to request a refund:</p>
+                        <p>Send an email to <a href="mailto:spldesignsbylouis@gmail.com" class="underline font-bold hover:text-gray-700">spldesignsbylouis@gmail.com</a> with your payment details and reason for cancellation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Booking Form (Formspree Integrated) -->
+    <section id="booking" class="py-16 sm:py-20 px-4 sm:px-6 section-alt">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-3 sm:mb-4 uppercase">Book A Design</h2>
+            <div class="w-16 sm:w-24 h-1 bg-black mx-auto mb-8 sm:mb-12"></div>
+            
+            <form action="https://formspree.io/f/xojkanjl" method="POST" class="space-y-4 sm:space-y-6" id="bookingForm">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold uppercase mb-2">Name of client</label>
+                    <input type="text" name="name" required placeholder="Jane Smith" class="form-input w-full p-3 sm:p-4 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold uppercase mb-2">Email</label>
+                    <input type="email" name="email" required placeholder="janekicks@gmail.com" class="form-input w-full p-3 sm:p-4 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold uppercase mb-2">Design Request</label>
+                    <input type="text" name="request" required placeholder="Logo" class="form-input w-full p-3 sm:p-4 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold uppercase mb-2">Design Details</label>
+                    <textarea name="message" rows="4" required placeholder="ALUMINIUM LOGO WITH BLUE COLOUR" class="form-textarea w-full p-3 sm:p-4 text-sm resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full btn-secondary font-bold text-base sm:text-lg py-3 sm:py-4 uppercase tracking-widest mt-2" id="submitBtn">
+                    BOOK
+                </button>
+            </form>
+            
+            <!-- Success Message (Hidden by default) -->
+            <div id="successMessage" class="hidden mt-6 p-4 bg-white border-2 border-black text-center">
+                <p class="font-bold text-lg">Thank You! 🎉</p>
+                <p class="text-sm mt-1">Your booking request has been sent. We'll contact you within 24 hours.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 sm:py-12 px-4 sm:px-6 border-t-4 border-black bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <img src="dark LD logo.png" alt="Louis Designs Logo" class="h-8 w-auto sm:h-10">
+                    <span class="font-bold uppercase tracking-tight text-sm sm:text-base">Louis Designs</span>
+                </div>
+                <div class="flex gap-3 sm:gap-6">
+                    <a href="https://www.instagram.com/24_louisdesigns?igsh=MTQwc3lxaWRvBWrwcw==" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center gap-2 btn-primary px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold uppercase">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        Instagram
+                    </a>
+                    <a href="https://www.tiktok.com/@24_louisdesigns?_t=8mfu44P8ksw&_r=1" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center gap-2 btn-primary px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold uppercase">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                        </svg>
+                        TikTok
+                    </a>
+                </div>
+            </div>
+            <div class="text-center mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-300 text-xs sm:text-sm">
+                <p>&copy; 2026 Louis Designs. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    </div> <!-- End Main Content -->
+
+    <script>
+        // Intro Animation
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    gsap.to('#intro-loader', {
+                        opacity: 0, duration: 1, ease: "power2.inOut",
+                        onComplete: () => {
+                            document.getElementById('intro-loader').style.display = 'none';
+                            document.getElementById('mainContent').style.visibility = 'visible';
+                            gsap.to('#mainContent', { opacity: 1, duration: 1 });
+                        }
+                    });
+                }
+            });
+            tl.to('.circle-2', { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" })
+              .to('.circle-1', { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" }, "-=1")
+              .to('.line-horizontal', { opacity: 1, scaleX: 1, duration: 1, ease: "power2.inOut" }, "-=0.6")
+              .to('.line-vertical', { opacity: 1, scaleY: 1, duration: 1, ease: "power2.inOut" }, "-=0.8")
+              .to('.particle', { opacity: 1, scale: 1, duration: 0.5, stagger: { each: 0.1, from: "random" }, ease: "back.out(3)" }, "-=0.3")
+              .to('.logo-img', { opacity: 1, scale: 1, duration: 1.5, ease: "elastic.out(1, 0.5)", rotation: 0 }, "-=0.2")
+              .to('.particle:nth-child(5)', { x: 60, y: -60, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=0.5")
+              .to('.particle:nth-child(6)', { x: -60, y: 60, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=1.3")
+              .to('.particle:nth-child(7)', { x: 40, y: 40, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=1.3")
+              .to('.circle-1, .circle-2', { opacity: 0, scale: 0.3, duration: 1, ease: "power2.in" }, "-=1")
+              .to('.line-horizontal, .line-vertical', { opacity: 0, scale: 0, duration: 0.8, ease: "power2.in" }, "-=0.8")
+              .to('.tagline', { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }, "-=0.5")
+              .to('.logo-img', { scale: 1.08, duration: 0.5, ease: "power2.inOut", yoyo: true, repeat: 1 }, "+=0.5")
+              .to({}, { duration: 1 });
+        });
+
+        // Slider Functionality
+        let currentSlide = 0;
+        const slider = document.getElementById('portfolioSlider');
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const sliderWrapper = document.getElementById('sliderWrapper');
+        const dotsContainer = document.getElementById('sliderDots');
+        let touchStartX = 0, touchEndX = 0, autoSlideInterval;
+        
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.className = `slider-dot ${index === 0 ? 'active' : ''}`;
+                dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                dot.onclick = () => goToSlide(index);
+                dotsContainer.appendChild(dot);
+            });
+        }
+        
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.slider-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            updateSlider();
+            resetAutoSlide();
+        }
+        
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+            resetAutoSlide();
+        }
+        
+        // Touch swipe support
+        sliderWrapper.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+        sliderWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) diff > 0 ? changeSlide(1) : changeSlide(-1);
+        }, { passive: true });
+        
+        function startAutoSlide() { autoSlideInterval = setInterval(() => changeSlide(1), 5000); }
+        function stopAutoSlide() { clearInterval(autoSlideInterval); }
+        function resetAutoSlide() { stopAutoSlide(); startAutoSlide(); }
+        
+        sliderWrapper.addEventListener('mouseenter', stopAutoSlide);
+        sliderWrapper.addEventListener('mouseleave', startAutoSlide);
+        
+        createDots();
+        updateSlider();
+        startAutoSlide();
+        
+        // Formspree Form Handler
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: this.method,
+                    body: new FormData(this),
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    this.reset();
+                    setTimeout(() => {
+                        document.getElementById('successMessage').classList.add('hidden');
+                    }, 5000);
+                } else {
+                    alert('Oops! There was a problem sending your request. Please try again.');
+                }
+            } catch (error) {
+                alert('Network error. Please check your connection and try again.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Prevent iOS double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
