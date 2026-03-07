@@ -26,6 +26,39 @@
             font-family: 'Playfair Display', serif;
         }
         
+        /* Full-Screen Intro Overlay */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #intro-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* Main Content - Initially Hidden */
+        .main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+        
+        .main-content.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #FF8C00; }
@@ -102,7 +135,7 @@
             transform: scale(1.02);
         }
         
-        /* Navigation Arrows - Show on Hover (Desktop) */
+        /* Navigation Arrows */
         .slider-nav {
             position: absolute;
             top: 50%;
@@ -325,134 +358,10 @@
             background-color: rgba(0,0,0,0.05);
         }
 
-        /* Intro Animation Styles */
-        #intro-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #FF8C00;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-wrapper {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            opacity: 0;
-            transform: scale(0);
-        }
-
-        .geometric-shape {
-            position: absolute;
-            border: 3px solid #000;
-            opacity: 0;
-        }
-
-        .circle-1 {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-        }
-
-        .circle-2 {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-        }
-
-        .line-horizontal {
-            width: 250px;
-            height: 3px;
-            background: #000;
-            top: 50%;
-            left: 50%;
-            transform: translateX(-50%) scaleX(0);
-            transform-origin: center center;
-        }
-
-        .line-vertical {
-            width: 3px;
-            height: 250px;
-            background: #000;
-            top: 50%;
-            left: 50%;
-            transform: translateY(-50%) scaleY(0);
-            transform-origin: center center;
-        }
-
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #000;
-            border-radius: 50%;
-            opacity: 0;
-            transform: scale(0);
-        }
-
-        .tagline {
-            position: absolute;
-            bottom: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            color: #000;
-            opacity: 0;
-            font-weight: 300;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-        }
-
-        /* Main content hidden initially */
-        .main-content {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        /* Smooth animations */
-        .fade-in {
-            animation: fadeIn 0.8s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* Mobile optimizations */
         @media (max-width: 768px) {
-            .logo-wrapper {
-                width: 250px;
-                height: 250px;
-            }
             h1 {
                 font-size: 2.5rem;
-            }
-            .tagline {
-                font-size: 10px;
-                letter-spacing: 4px;
-                bottom: -50px;
             }
         }
 
@@ -470,25 +379,15 @@
 </head>
 <body class="antialiased">
 
-    <!-- Intro Animation Loader -->
-    <div id="intro-loader">
-        <div class="logo-wrapper">
-            <div class="geometric-shape circle-1"></div>
-            <div class="geometric-shape circle-2"></div>
-            <div class="geometric-shape line-horizontal"></div>
-            <div class="geometric-shape line-vertical"></div>
-            <div class="particle" style="top: 15%; left: 25%;"></div>
-            <div class="particle" style="top: 75%; left: 80%;"></div>
-            <div class="particle" style="top: 35%; left: 85%;"></div>
-            <div class="particle" style="top: 80%; left: 20%;"></div>
-            <div class="particle" style="top: 10%; left: 70%;"></div>
-            <div class="particle" style="top: 65%; left: 10%;"></div>
-            <img src="dark LD logo.png" alt="Louis Designs Logo" class="logo-img" id="logoImage">
-            <div class="tagline">Premium Design Studio</div>
-        </div>
+    <!-- Full-Screen Intro Overlay -->
+    <div id="intro-overlay">
+        <video id="intro-video" playsinline muted>
+            <source src="119972.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
     </div>
 
-    <!-- Main Website Content -->
+    <!-- Main Website Content (Hidden Initially) -->
     <div class="main-content" id="mainContent">
 
     <!-- Sticky Navigation -->
@@ -507,7 +406,7 @@
     </header>
 
     <!-- Section 1: Home (Hero + FIXED 7-Image Portfolio Slider) -->
-    <section id="home" class="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 fade-in">
+    <section id="home" class="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-12 sm:mb-16">
                 <!-- Hero Content -->
@@ -753,34 +652,30 @@
     </div> <!-- End Main Content -->
 
     <script>
-        // Intro Animation
+        // Intro Video Logic
         window.addEventListener('load', () => {
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    gsap.to('#intro-loader', {
-                        opacity: 0, duration: 1, ease: "power2.inOut",
-                        onComplete: () => {
-                            document.getElementById('intro-loader').style.display = 'none';
-                            document.getElementById('mainContent').style.visibility = 'visible';
-                            gsap.to('#mainContent', { opacity: 1, duration: 1 });
-                        }
-                    });
-                }
-            });
-            tl.to('.circle-2', { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" })
-              .to('.circle-1', { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" }, "-=1")
-              .to('.line-horizontal', { opacity: 1, scaleX: 1, duration: 1, ease: "power2.inOut" }, "-=0.6")
-              .to('.line-vertical', { opacity: 1, scaleY: 1, duration: 1, ease: "power2.inOut" }, "-=0.8")
-              .to('.particle', { opacity: 1, scale: 1, duration: 0.5, stagger: { each: 0.1, from: "random" }, ease: "back.out(3)" }, "-=0.3")
-              .to('.logo-img', { opacity: 1, scale: 1, duration: 1.5, ease: "elastic.out(1, 0.5)", rotation: 0 }, "-=0.2")
-              .to('.particle:nth-child(5)', { x: 60, y: -60, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=0.5")
-              .to('.particle:nth-child(6)', { x: -60, y: 60, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=1.3")
-              .to('.particle:nth-child(7)', { x: 40, y: 40, opacity: 0, duration: 1.5, ease: "power2.out" }, "-=1.3")
-              .to('.circle-1, .circle-2', { opacity: 0, scale: 0.3, duration: 1, ease: "power2.in" }, "-=1")
-              .to('.line-horizontal, .line-vertical', { opacity: 0, scale: 0, duration: 0.8, ease: "power2.in" }, "-=0.8")
-              .to('.tagline', { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }, "-=0.5")
-              .to('.logo-img', { scale: 1.08, duration: 0.5, ease: "power2.inOut", yoyo: true, repeat: 1 }, "+=0.5")
-              .to({}, { duration: 1 });
+            const introOverlay = document.getElementById('intro-overlay');
+            const introVideo = document.getElementById('intro-video');
+            const mainContent = document.getElementById('mainContent');
+            
+            // Function to hide intro and show content
+            function hideIntro() {
+                // Fade out overlay
+                introOverlay.style.transition = 'opacity 0.8s ease-out';
+                introOverlay.style.opacity = '0';
+                
+                setTimeout(() => {
+                    introOverlay.style.display = 'none';
+                    mainContent.classList.add('visible');
+                }, 800);
+            }
+            
+            // Try to play video
+            introVideo.play().catch(e => console.log("Autoplay prevented:", e));
+            
+            // Hide intro when video ends OR after 4 seconds (whichever comes first)
+            introVideo.addEventListener('ended', hideIntro);
+            setTimeout(hideIntro, 4000);
         });
 
         // Slider Functionality
