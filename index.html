@@ -33,9 +33,10 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: #000;
+            background: #000000;
             z-index: 99999;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow: hidden;
@@ -47,11 +48,40 @@
             object-fit: contain;
         }
         
+        /* Loading Indicator */
+        .loading-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: #FF8C00;
+            transition: width 0.1s linear;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        
         /* Main Content - Initially Hidden */
         .main-content {
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.8s ease-out, visibility 0.8s;
+            transition: opacity 1s ease-out, visibility 1s;
         }
         
         .main-content.visible {
@@ -363,6 +393,10 @@
             h1 {
                 font-size: 2.5rem;
             }
+            .loading-indicator {
+                font-size: 12px;
+                bottom: 30px;
+            }
         }
 
         /* Touch device optimizations */
@@ -379,12 +413,14 @@
 </head>
 <body class="antialiased">
 
-    <!-- Full-Screen Intro Overlay -->
+    <!-- Full-Screen Intro Overlay (6.5 seconds) -->
     <div id="intro-overlay">
-        <video id="intro-video" playsinline muted>
+        <video id="intro-video" autoplay muted loop playsinline>
             <source src="119972.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+        <div class="loading-indicator">Loading...</div>
+        <div class="loading-bar" id="loading-bar"></div>
     </div>
 
     <!-- Main Website Content (Hidden Initially) -->
@@ -652,30 +688,47 @@
     </div> <!-- End Main Content -->
 
     <script>
-        // Intro Video Logic
+        // Intro Video Logic - 6.5 Second Timer
         window.addEventListener('load', () => {
             const introOverlay = document.getElementById('intro-overlay');
             const introVideo = document.getElementById('intro-video');
             const mainContent = document.getElementById('mainContent');
+            const loadingBar = document.getElementById('loading-bar');
+            
+            // Animate loading bar
+            let progress = 0;
+            const barInterval = setInterval(() => {
+                progress += 1.54; // 100 / 6.5 seconds ≈ 1.54 per 100ms
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(barInterval);
+                }
+                loadingBar.style.width = progress + '%';
+            }, 100);
             
             // Function to hide intro and show content
             function hideIntro() {
+                clearInterval(barInterval);
+                loadingBar.style.width = '100%';
+                
                 // Fade out overlay
-                introOverlay.style.transition = 'opacity 0.8s ease-out';
+                introOverlay.style.transition = 'opacity 1s ease-out';
                 introOverlay.style.opacity = '0';
+                
+                // Auto-scroll to top
+                window.scrollTo(0, 0);
                 
                 setTimeout(() => {
                     introOverlay.style.display = 'none';
                     mainContent.classList.add('visible');
-                }, 800);
+                }, 1000);
             }
             
             // Try to play video
             introVideo.play().catch(e => console.log("Autoplay prevented:", e));
             
-            // Hide intro when video ends OR after 4 seconds (whichever comes first)
-            introVideo.addEventListener('ended', hideIntro);
-            setTimeout(hideIntro, 4000);
+            // Hide intro after exactly 6.5 seconds
+            setTimeout(hideIntro, 6500);
         });
 
         // Slider Functionality
