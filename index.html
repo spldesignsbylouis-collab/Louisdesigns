@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="dark LD logo.png">
     <style>
         * { 
             box-sizing: border-box; 
@@ -413,7 +414,7 @@
 
     <!-- Full-Screen Intro Overlay (6.5 seconds) -->
     <div id="intro-overlay">
-        <video id="intro-video" autoplay muted loop playsinline preload="auto">
+        <video id="intro-video" autoplay muted playsinline preload="auto" poster="dark LD logo.png">
             <source src="119972.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -695,6 +696,7 @@
         const introVideo = document.getElementById('intro-video');
         const mainContent = document.getElementById('mainContent');
         const loadingBar = document.getElementById('loading-bar');
+        let sliderInitialized = false;
         
         // Animate loading bar
         let progress = 0;
@@ -706,6 +708,15 @@
             }
             loadingBar.style.width = progress + '%';
         }, 100);
+        
+        // Initialize slider only after intro fades out
+        function initSlider() {
+            if (sliderInitialized) return;
+            sliderInitialized = true;
+            createDots();
+            updateSlider();
+            startAutoSlide();
+        }
         
         // Function to hide intro and show content
         function hideIntro() {
@@ -722,6 +733,8 @@
             setTimeout(() => {
                 introOverlay.style.display = 'none';
                 mainContent.classList.add('visible');
+                // Initialize slider after content is visible
+                setTimeout(initSlider, 300);
             }, 1000);
         }
         
@@ -789,10 +802,6 @@
         
         sliderWrapper.addEventListener('mouseenter', stopAutoSlide);
         sliderWrapper.addEventListener('mouseleave', startAutoSlide);
-        
-        createDots();
-        updateSlider();
-        startAutoSlide();
         
         // Formspree Form Handler
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
