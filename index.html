@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Louis Designs | Premium Digital Creative Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" href="dark LD logo.png">
     <style>
         * { 
             box-sizing: border-box; 
@@ -414,7 +415,7 @@
 
     <!-- Full-Screen Intro Overlay (6.5 seconds) -->
     <div id="intro-overlay">
-        <video id="intro-video" autoplay muted playsinline preload="auto" poster="dark LD logo.png">
+        <video id="intro-video" autoplay muted loop playsinline>
             <source src="119972.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -686,63 +687,49 @@
 
     </div> <!-- End Main Content -->
 
-    <!-- Scripts moved to bottom for faster loading -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    
     <script>
-        // 6.5 Second Fail-Safe Timer - Starts immediately
-        const introOverlay = document.getElementById('intro-overlay');
-        const introVideo = document.getElementById('intro-video');
-        const mainContent = document.getElementById('mainContent');
-        const loadingBar = document.getElementById('loading-bar');
-        let sliderInitialized = false;
-        
-        // Animate loading bar
-        let progress = 0;
-        const barInterval = setInterval(() => {
-            progress += 1.54; // 100 / 6.5 seconds ≈ 1.54 per 100ms
-            if (progress >= 100) {
-                progress = 100;
+        // Intro Video Logic - 6.5 Second Timer
+        window.addEventListener('load', () => {
+            const introOverlay = document.getElementById('intro-overlay');
+            const introVideo = document.getElementById('intro-video');
+            const mainContent = document.getElementById('mainContent');
+            const loadingBar = document.getElementById('loading-bar');
+            
+            // Animate loading bar
+            let progress = 0;
+            const barInterval = setInterval(() => {
+                progress += 1.54; // 100 / 6.5 seconds ≈ 1.54 per 100ms
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(barInterval);
+                }
+                loadingBar.style.width = progress + '%';
+            }, 100);
+            
+            // Function to hide intro and show content
+            function hideIntro() {
                 clearInterval(barInterval);
+                loadingBar.style.width = '100%';
+                
+                // Fade out overlay
+                introOverlay.style.transition = 'opacity 1s ease-out';
+                introOverlay.style.opacity = '0';
+                
+                // Auto-scroll to top
+                window.scrollTo(0, 0);
+                
+                setTimeout(() => {
+                    introOverlay.style.display = 'none';
+                    mainContent.classList.add('visible');
+                }, 1000);
             }
-            loadingBar.style.width = progress + '%';
-        }, 100);
-        
-        // Initialize slider only after intro fades out
-        function initSlider() {
-            if (sliderInitialized) return;
-            sliderInitialized = true;
-            createDots();
-            updateSlider();
-            startAutoSlide();
-        }
-        
-        // Function to hide intro and show content
-        function hideIntro() {
-            clearInterval(barInterval);
-            loadingBar.style.width = '100%';
             
-            // Fade out overlay
-            introOverlay.style.transition = 'opacity 1s ease-out';
-            introOverlay.style.opacity = '0';
+            // Try to play video
+            introVideo.play().catch(e => console.log("Autoplay prevented:", e));
             
-            // Auto-scroll to top
-            window.scrollTo(0, 0);
-            
-            setTimeout(() => {
-                introOverlay.style.display = 'none';
-                mainContent.classList.add('visible');
-                // Initialize slider after content is visible
-                setTimeout(initSlider, 300);
-            }, 1000);
-        }
-        
-        // Try to play video immediately
-        introVideo.play().catch(e => console.log("Autoplay prevented:", e));
-        
-        // STRICT 6.5 second timeout - no waiting for window load
-        setTimeout(hideIntro, 6500);
+            // Hide intro after exactly 6.5 seconds
+            setTimeout(hideIntro, 6500);
+        });
 
         // Slider Functionality
         let currentSlide = 0;
@@ -802,6 +789,10 @@
         
         sliderWrapper.addEventListener('mouseenter', stopAutoSlide);
         sliderWrapper.addEventListener('mouseleave', startAutoSlide);
+        
+        createDots();
+        updateSlider();
+        startAutoSlide();
         
         // Formspree Form Handler
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
